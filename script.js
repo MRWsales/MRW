@@ -2,7 +2,13 @@
   "use strict";
   const products = [
     {id:1,name:"AirPod Pro 3",category:"accessories",price:120,tag:"MRW pick",image:"assets/airpod-pro-3.jpg"},
-    {id:2,name:"Classic Low-Top Sneaker",category:"footwear",price:78,tag:"New",image:"https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=80"},
+    {id:2,name:"Classic Low-Top Sneaker",category:"shoes",price:78,tag:"New",image:"https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=80"},
+    {id:7,name:"Everyday Running Shoe",category:"shoes",price:84,tag:"New",image:"https://images.unsplash.com/photo-1460353581641-37baddab0fa2?auto=format&fit=crop&w=900&q=85"},
+    {id:8,name:"Classic White Sneaker",category:"shoes",price:72,tag:"",image:"https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=900&q=85"},
+    {id:9,name:"Retro Court Sneaker",category:"shoes",price:88,tag:"MRW pick",image:"https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&w=900&q=85"},
+    {id:10,name:"Minimal Street Sneaker",category:"shoes",price:96,tag:"",image:"https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?auto=format&fit=crop&w=900&q=85"},
+    {id:11,name:"Casual Everyday Slides",category:"shoes",price:38,tag:"",image:"https://images.unsplash.com/photo-1562273138-f46be4ebdf33?auto=format&fit=crop&w=900&q=85"},
+    {id:12,name:"Retro Runner",category:"shoes",price:92,tag:"",image:"https://images.unsplash.com/photo-1539185441755-769473a23570?auto=format&fit=crop&w=900&q=85"}
     {id:3,name:"Essential Cotton Tee",category:"clothing",price:32,tag:"Everyday essential",image:"https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=900&q=80"},
     {id:4,name:"Minimalist Everyday Watch",category:"accessories",price:92,tag:"",image:"https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=900&q=80"},
     {id:5,name:"Relaxed Weekend Layers",category:"clothing",price:56,tag:"",image:"https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&fit=crop&w=900&q=80"},
