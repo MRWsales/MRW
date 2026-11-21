@@ -11,6 +11,31 @@
     {id:12,name:"Retro Runner",category:"shoes",price:92,tag:"",image:"https://images.unsplash.com/photo-1539185441755-769473a23570?auto=format&fit=crop&w=900&q=85"},
   ];
   const $ = (selector) => document.querySelector(selector);
+  // Cycle the homepage hero through every product in the collection.
+  const heroImage = $(".hero-image");
+  const heroCaption = $(".hero-caption span:first-child");
+  let heroIndex = 0;
+  if (heroImage && products.length) {
+    const showHeroProduct = (index) => {
+      const product = products[index];
+      heroImage.style.opacity = "0";
+      window.setTimeout(() => {
+        heroImage.style.backgroundImage = 'url("' + product.image + '")';
+        heroImage.setAttribute("aria-label", product.name);
+        if (heroCaption) heroCaption.textContent = String(index + 1).padStart(2, "0") + " / " + String(products.length).padStart(2, "0");
+        heroImage.style.opacity = "1";
+      }, 350);
+    };
+    products.forEach((product) => {
+      const preload = new Image();
+      preload.src = product.image;
+    });
+    showHeroProduct(heroIndex);
+    window.setInterval(() => {
+      heroIndex = (heroIndex + 1) % products.length;
+      showHeroProduct(heroIndex);
+    }, 10000);
+  }
   const grid = $("#product-grid");
   const searchInput = $("#product-search");
   const sortSelect = $("#sort-products");
