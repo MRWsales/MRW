@@ -1,6 +1,5 @@
 (() => {
   "use strict";
-
   const products = [
     {id:1,name:"Everyday Wireless Headphones",category:"accessories",price:64,tag:"MRW pick",image:"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=900&q=80"},
     {id:2,name:"Classic Low-Top Sneaker",category:"footwear",price:78,tag:"New",image:"https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=80"},
@@ -9,7 +8,6 @@
     {id:5,name:"Relaxed Weekend Layers",category:"clothing",price:56,tag:"",image:"https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&fit=crop&w=900&q=80"},
     {id:6,name:"Structured Carryall Bag",category:"accessories",price:48,tag:"",image:"https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=900&q=80"}
   ];
-
   const $ = (selector) => document.querySelector(selector);
   const grid = $("#product-grid");
   const searchInput = $("#product-search");
@@ -18,8 +16,9 @@
   const bagDrawer = $("#bag-drawer");
   const backdrop = $("#drawer-backdrop");
   const bagItems = $("#bag-items");
+  const menu = $(".main-nav");
+  const menuToggle = $(".menu-toggle");
   const money = (amount) => new Intl.NumberFormat("en-US", {style:"currency",currency:"USD"}).format(amount);
-
   let activeCategory = "all";
   let cart = loadCart();
   let toastTimer;
@@ -28,33 +27,37 @@
     try {
       const saved = JSON.parse(localStorage.getItem("mrw-cart") || "[]");
       if (!Array.isArray(saved)) return [];
-      return saved.filter((item) => products.some((product) => product.id === item.id) && Number.isInteger(item.quantity) && item.quantity > 0);
-    } catch {
-      return [];
-    }
+      return saved.filter((item) => item && products.some((product) => product.id === item.id) && Number.isSafeInteger(item.quantity) && item.quantity > 0);
+    } catch { return []; }
   }
-
   function saveCart() {
-    try { localStorage.setItem("mrw-cart", JSON.stringify(cart)); } catch { /* Storage may be unavailable. */ }
+    try { localStorage.setItem("mrw-cart", JSON.stringify(cart)); }
+    catch { /* The bag still works for this visit if storage is unavailable. */ }
   }
-
+  function setActiveCategory(category) {
+    activeCategory = category;
+    document.querySelectorAll(".filter-button").forEach((button) => {
+      const isActive = button.dataset.category === category;
+      button.classList.toggle("active", isActive);
+      button.setAttribute("aria-pressed", String(isActive));
+    });
+    document.querySelectorAll("[data-nav-category]").forEach((link) => link.classList.toggle("active", link.dataset.navCategory === category));
+    renderProducts();
+  }
   function renderProducts() {
     const query = searchInput.value.trim().toLowerCase();
-    let visible = products.filter((product) => {
+    const visible = products.filter((product) => {
       const matchesCategory = activeCategory === "all" || product.category === activeCategory;
       const matchesSearch = (product.name + " " + product.category).toLowerCase().includes(query);
       return matchesCategory && matchesSearch;
     });
-
     switch (sortSelect.value) {
       case "price-low": visible.sort((a,b) => a.price - b.price); break;
       case "price-high": visible.sort((a,b) => b.price - a.price); break;
       case "name": visible.sort((a,b) => a.name.localeCompare(b.name)); break;
     }
-
     grid.replaceChildren();
     emptyState.hidden = visible.length !== 0;
-
     visible.forEach((product) => {
       const card = document.createElement("article");
       card.className = "product-card";
@@ -65,7 +68,7 @@
       image.src = product.image;
       image.alt = product.name;
       image.loading = "lazy";
-      image.onerror = () => { image.onerror = null; image.src = "https://placehold.co/800x1000/f0eee8/777?text=MRW"; };
+      image.onerror = () => { image.onerror = null; image.src = "https://placehold.co/800x940/f0eee8/777?text=MRW"; };
       imageWrap.append(image);
       if (product.tag) {
         const tag = document.createElement("span");
@@ -78,8 +81,8 @@
       add.type = "button";
       add.dataset.add = String(product.id);
       add.textContent = "Add to bag +";
+      add.setAttribute("aria-label", "Add " + product.name + " to bag");
       imageWrap.append(add);
-
       const info = document.createElement("div");
       info.className = "product-info";
       const description = document.createElement("div");
@@ -98,7 +101,6 @@
       grid.append(card);
     });
   }
-
   function addToCart(id) {
     const product = products.find((item) => item.id === id);
     if (!product) return;
@@ -109,7 +111,6 @@
     renderCart();
     showToast(product.name + " added to your bag");
   }
-
   function changeQuantity(id, amount) {
     const item = cart.find((entry) => entry.id === id);
     if (!item) return;
@@ -118,7 +119,6 @@
     saveCart();
     renderCart();
   }
-
   function renderCart() {
     const count = cart.reduce((sum,item) => sum + item.quantity, 0);
     const subtotal = cart.reduce((sum,item) => {
@@ -129,7 +129,6 @@
     $("#drawer-count").textContent = "(" + count + ")";
     $("#bag-subtotal").textContent = money(subtotal);
     bagItems.replaceChildren();
-
     if (cart.length === 0) {
       const empty = document.createElement("p");
       empty.className = "bag-empty";
@@ -137,7 +136,6 @@
       bagItems.append(empty);
       return;
     }
-
     cart.forEach((item) => {
       const product = products.find((entry) => entry.id === item.id);
       if (!product) return;
@@ -159,7 +157,7 @@
       minus.type = "button";
       minus.dataset.quantity = "-1";
       minus.dataset.id = String(product.id);
-      minus.setAttribute("aria-label", "Decrease quantity");
+      minus.setAttribute("aria-label", "Decrease quantity of " + product.name);
       minus.textContent = "−";
       const quantity = document.createElement("span");
       quantity.textContent = String(item.quantity);
@@ -167,7 +165,7 @@
       plus.type = "button";
       plus.dataset.quantity = "1";
       plus.dataset.id = String(product.id);
-      plus.setAttribute("aria-label", "Increase quantity");
+      plus.setAttribute("aria-label", "Increase quantity of " + product.name);
       plus.textContent = "+";
       controls.append(minus, quantity, plus);
       details.append(name, price, controls);
@@ -176,27 +174,28 @@
       remove.className = "remove-item";
       remove.dataset.remove = String(product.id);
       remove.textContent = "Remove";
+      remove.setAttribute("aria-label", "Remove " + product.name + " from bag");
       row.append(image, details, remove);
       bagItems.append(row);
     });
   }
-
   function openBag() {
     backdrop.hidden = false;
-    requestAnimationFrame(() => bagDrawer.classList.add("open"));
+    bagDrawer.inert = false;
     bagDrawer.setAttribute("aria-hidden", "false");
     document.body.style.overflow = "hidden";
+    requestAnimationFrame(() => bagDrawer.classList.add("open"));
     $("#bag-close").focus();
   }
-
   function closeBag() {
+    if (!bagDrawer.classList.contains("open")) return;
     bagDrawer.classList.remove("open");
     bagDrawer.setAttribute("aria-hidden", "true");
+    bagDrawer.inert = true;
     backdrop.hidden = true;
     document.body.style.overflow = "";
     $("#bag-open").focus();
   }
-
   function showToast(message) {
     const toast = $("#toast");
     toast.textContent = message;
@@ -204,24 +203,24 @@
     window.clearTimeout(toastTimer);
     toastTimer = window.setTimeout(() => toast.classList.remove("show"), 2200);
   }
-
   function setTheme(theme) {
     document.documentElement.dataset.theme = theme;
-    try { localStorage.setItem("mrw-theme", theme); } catch { /* Storage may be unavailable. */ }
+    try { localStorage.setItem("mrw-theme", theme); }
+    catch { /* Theme still changes for this visit if storage is unavailable. */ }
     $("#theme-toggle").setAttribute("aria-label", theme === "dark" ? "Switch to light theme" : "Switch to dark theme");
     $("#theme-toggle").textContent = theme === "dark" ? "☼" : "◐";
+    const themeColor = document.querySelector('meta[name="theme-color"]');
+    if (themeColor) themeColor.content = theme === "dark" ? "#171715" : "#f7f6f2";
   }
-
   try {
     const savedTheme = localStorage.getItem("mrw-theme");
     if (savedTheme === "dark" || savedTheme === "light") setTheme(savedTheme);
-  } catch { /* Use the default light theme. */ }
+  } catch { /* Keep the default light theme. */ }
 
   grid.addEventListener("click", (event) => {
     const button = event.target.closest("[data-add]");
     if (button) addToCart(Number(button.dataset.add));
   });
-
   bagItems.addEventListener("click", (event) => {
     const quantityButton = event.target.closest("[data-quantity]");
     const removeButton = event.target.closest("[data-remove]");
@@ -232,25 +231,15 @@
       renderCart();
     }
   });
-
-  document.querySelectorAll(".filter-button").forEach((button) => {
-    button.addEventListener("click", () => {
-      activeCategory = button.dataset.category;
-      document.querySelectorAll(".filter-button").forEach((item) => item.classList.toggle("active", item === button));
-      renderProducts();
-    });
-  });
-
+  document.querySelectorAll(".filter-button").forEach((button) => button.addEventListener("click", () => setActiveCategory(button.dataset.category)));
   document.querySelectorAll("[data-nav-category]").forEach((link) => {
     link.addEventListener("click", () => {
-      activeCategory = link.dataset.navCategory;
-      document.querySelectorAll(".filter-button").forEach((button) => button.classList.toggle("active", button.dataset.category === activeCategory));
-      renderProducts();
-      $(".main-nav").classList.remove("open");
-      $(".menu-toggle").setAttribute("aria-expanded", "false");
+      setActiveCategory(link.dataset.navCategory);
+      menu.classList.remove("open");
+      menuToggle.setAttribute("aria-expanded", "false");
+      menuToggle.setAttribute("aria-label", "Open navigation");
     });
   });
-
   searchInput.addEventListener("input", renderProducts);
   sortSelect.addEventListener("change", renderProducts);
   $("#theme-toggle").addEventListener("click", () => setTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark"));
@@ -258,16 +247,21 @@
   $("#bag-close").addEventListener("click", closeBag);
   backdrop.addEventListener("click", closeBag);
   $("#checkout-button").addEventListener("click", () => showToast("Checkout is a preview — payments are not enabled yet."));
-  $(".menu-toggle").addEventListener("click", () => {
-    const nav = $(".main-nav");
-    const isOpen = nav.classList.toggle("open");
-    $(".menu-toggle").setAttribute("aria-expanded", String(isOpen));
-    $(".menu-toggle").setAttribute("aria-label", isOpen ? "Close navigation" : "Open navigation");
+  menuToggle.addEventListener("click", () => {
+    const isOpen = menu.classList.toggle("open");
+    menuToggle.setAttribute("aria-expanded", String(isOpen));
+    menuToggle.setAttribute("aria-label", isOpen ? "Close navigation" : "Open navigation");
   });
   document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && bagDrawer.classList.contains("open")) closeBag();
+    if (event.key !== "Escape") return;
+    if (bagDrawer.classList.contains("open")) closeBag();
+    if (menu.classList.contains("open")) {
+      menu.classList.remove("open");
+      menuToggle.setAttribute("aria-expanded", "false");
+      menuToggle.setAttribute("aria-label", "Open navigation");
+      menuToggle.focus();
+    }
   });
-
   $("#year").textContent = String(new Date().getFullYear());
   renderProducts();
   renderCart();
