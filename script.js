@@ -8,11 +8,7 @@
     {id:9,name:"Retro Court Sneaker",category:"shoes",price:88,tag:"MRW pick",image:"https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&w=900&q=85"},
     {id:10,name:"Minimal Street Sneaker",category:"shoes",price:96,tag:"",image:"https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?auto=format&fit=crop&w=900&q=85"},
     {id:11,name:"Casual Everyday Slides",category:"shoes",price:38,tag:"",image:"https://images.unsplash.com/photo-1562273138-f46be4ebdf33?auto=format&fit=crop&w=900&q=85"},
-    {id:12,name:"Retro Runner",category:"shoes",price:92,tag:"",image:"https://images.unsplash.com/photo-1539185441755-769473a23570?auto=format&fit=crop&w=900&q=85"}
-    {id:3,name:"Essential Cotton Tee",category:"clothing",price:32,tag:"Everyday essential",image:"https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=900&q=80"},
-    {id:4,name:"Minimalist Everyday Watch",category:"accessories",price:92,tag:"",image:"https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=900&q=80"},
-    {id:5,name:"Relaxed Weekend Layers",category:"clothing",price:56,tag:"",image:"https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&fit=crop&w=900&q=80"},
-    {id:6,name:"Structured Carryall Bag",category:"accessories",price:48,tag:"",image:"https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=900&q=80"}
+    {id:12,name:"Retro Runner",category:"shoes",price:92,tag:"",image:"https://images.unsplash.com/photo-1539185441755-769473a23570?auto=format&fit=crop&w=900&q=85"},
   ];
   const $ = (selector) => document.querySelector(selector);
   const grid = $("#product-grid");
