@@ -1,7 +1,7 @@
 (() => {
   "use strict";
   const products = [
-    {id:1,name:"Everyday Wireless Headphones",category:"accessories",price:64,tag:"MRW pick",image:"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=900&q=80"},
+    {id:1,name:"AirPods Pro 2",category:"accessories",price:120,tag:"MRW pick",image:"assets/airpods-pro-2.jpg"},
     {id:2,name:"Classic Low-Top Sneaker",category:"footwear",price:78,tag:"New",image:"https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=80"},
     {id:3,name:"Essential Cotton Tee",category:"clothing",price:32,tag:"Everyday essential",image:"https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=900&q=80"},
     {id:4,name:"Minimalist Everyday Watch",category:"accessories",price:92,tag:"",image:"https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=900&q=80"},
