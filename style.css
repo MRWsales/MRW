@@ -289,6 +289,8 @@ h1, h2, p { margin-top: 0; }
   transition: transform .55s cubic-bezier(.2,.7,.2,1);
 }
 .product-card:hover .product-image { transform: scale(1.045); }
+.product-image--contain { object-fit: contain; padding: 5%; }
+.product-card:hover .product-image--contain { transform: none; }
 .product-tag {
   position: absolute;
   top: 13px;

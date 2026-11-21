@@ -64,7 +64,7 @@
       const imageWrap = document.createElement("div");
       imageWrap.className = "product-image-wrap";
       const image = document.createElement("img");
-      image.className = "product-image";
+      image.className = product.id === 1 ? "product-image product-image--contain" : "product-image";
       image.src = product.image;
       image.alt = product.name;
       image.loading = "lazy";
