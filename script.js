@@ -55,7 +55,8 @@
     try {
       const saved = JSON.parse(localStorage.getItem("mrw-cart") || "[]");
       if (!Array.isArray(saved)) return [];
-      return saved.filter((item) => item && products.some((product) => product.id === item.id) && Number.isSafeInteger(item.quantity) && item.quantity > 0);
+      const normalized = saved.map((item) => item && item.id === 13 && !item.size ? {...item,size:"M"} : item);
+      return normalized.filter((item) => item && products.some((product) => product.id === item.id) && Number.isSafeInteger(item.quantity) && item.quantity > 0);
     } catch { return []; }
   }
   function saveCart() {
@@ -124,23 +125,48 @@
       const price = document.createElement("p");
       price.className = "product-price";
       price.textContent = money(product.price);
-      info.append(description, price);
+      if (product.id === 13) {
+        info.classList.add("product-info--sized");
+        const sizeSelect = document.createElement("select");
+        sizeSelect.className = "product-size-select";
+        sizeSelect.dataset.size = "true";
+        sizeSelect.setAttribute("aria-label", "Choose hoodie size");
+        const placeholder = document.createElement("option");
+        placeholder.value = "";
+        placeholder.textContent = "Select size";
+        placeholder.disabled = true;
+        placeholder.selected = true;
+        sizeSelect.append(placeholder);
+        ["S","M","L","XL"].forEach((size) => {
+          const option = document.createElement("option");
+          option.value = size;
+          option.textContent = size;
+          sizeSelect.append(option);
+        });
+        info.append(description, price, sizeSelect);
+      } else {
+        info.append(description, price);
+      }
       card.append(imageWrap, info);
       grid.append(card);
     });
   }
-  function addToCart(id) {
+  function addToCart(id, size = "") {
     const product = products.find((item) => item.id === id);
     if (!product) return;
-    const existing = cart.find((item) => item.id === id);
+    if (product.id === 13 && !["S","M","L","XL"].includes(size)) {
+      showToast("Choose a hoodie size first.");
+      return;
+    }
+    const existing = cart.find((item) => item.id === id && (item.size || "") === size);
     if (existing) existing.quantity += 1;
-    else cart.push({id,quantity:1});
+    else cart.push({id,quantity:1,...(size ? {size} : {})});
     saveCart();
     renderCart();
-    showToast(product.name + " added to your bag");
+    showToast(product.name + (size ? " · " + size : "") + " added to your bag");
   }
-  function changeQuantity(id, amount) {
-    const item = cart.find((entry) => entry.id === id);
+  function changeQuantity(id, size, amount) {
+    const item = cart.find((entry) => entry.id === id && (entry.size || "") === size);
     if (!item) return;
     item.quantity += amount;
     cart = cart.filter((entry) => entry.quantity > 0);
@@ -178,14 +204,15 @@
       const name = document.createElement("h3");
       name.textContent = product.name;
       const price = document.createElement("p");
-      price.textContent = money(product.price);
+      price.textContent = money(product.price) + (item.size ? " · Size " + item.size : "");
       const controls = document.createElement("div");
       controls.className = "quantity-controls";
       const minus = document.createElement("button");
       minus.type = "button";
       minus.dataset.quantity = "-1";
       minus.dataset.id = String(product.id);
-      minus.setAttribute("aria-label", "Decrease quantity of " + product.name);
+      minus.dataset.size = item.size || "";
+      minus.setAttribute("aria-label", "Decrease quantity of " + product.name + (item.size ? " size " + item.size : ""));
       minus.textContent = "−";
       const quantity = document.createElement("span");
       quantity.textContent = String(item.quantity);
@@ -193,7 +220,8 @@
       plus.type = "button";
       plus.dataset.quantity = "1";
       plus.dataset.id = String(product.id);
-      plus.setAttribute("aria-label", "Increase quantity of " + product.name);
+      plus.dataset.size = item.size || "";
+      plus.setAttribute("aria-label", "Increase quantity of " + product.name + (item.size ? " size " + item.size : ""));
       plus.textContent = "+";
       controls.append(minus, quantity, plus);
       details.append(name, price, controls);
@@ -201,8 +229,9 @@
       remove.type = "button";
       remove.className = "remove-item";
       remove.dataset.remove = String(product.id);
+      remove.dataset.size = item.size || "";
       remove.textContent = "Remove";
-      remove.setAttribute("aria-label", "Remove " + product.name + " from bag");
+      remove.setAttribute("aria-label", "Remove " + product.name + (item.size ? " size " + item.size : "") + " from bag");
       row.append(image, details, remove);
       bagItems.append(row);
     });
@@ -247,14 +276,23 @@
 
   grid.addEventListener("click", (event) => {
     const button = event.target.closest("[data-add]");
-    if (button) addToCart(Number(button.dataset.add));
+    if (button) {
+      const id = Number(button.dataset.add);
+      const sizeSelect = button.closest(".product-card").querySelector("[data-size]");
+      if (id === 13 && sizeSelect && !sizeSelect.value) {
+        showToast("Choose a hoodie size first.");
+        sizeSelect.focus();
+        return;
+      }
+      addToCart(id, sizeSelect ? sizeSelect.value : "");
+    }
   });
   bagItems.addEventListener("click", (event) => {
     const quantityButton = event.target.closest("[data-quantity]");
     const removeButton = event.target.closest("[data-remove]");
-    if (quantityButton) changeQuantity(Number(quantityButton.dataset.id), Number(quantityButton.dataset.quantity));
+    if (quantityButton) changeQuantity(Number(quantityButton.dataset.id), quantityButton.dataset.size || "", Number(quantityButton.dataset.quantity));
     if (removeButton) {
-      cart = cart.filter((item) => item.id !== Number(removeButton.dataset.remove));
+      cart = cart.filter((item) => !(item.id === Number(removeButton.dataset.remove) && (item.size || "") === (removeButton.dataset.size || "")));
       saveCart();
       renderCart();
     }
