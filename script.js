@@ -9,6 +9,7 @@
     {id:10,name:"Minimal Street Sneaker",category:"shoes",price:96,tag:"",image:"https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?auto=format&fit=crop&w=900&q=85"},
     {id:11,name:"Casual Everyday Slides",category:"shoes",price:38,tag:"",image:"https://images.unsplash.com/photo-1562273138-f46be4ebdf33?auto=format&fit=crop&w=900&q=85"},
     {id:12,name:"Retro Runner",category:"shoes",price:92,tag:"",image:"https://images.unsplash.com/photo-1539185441755-769473a23570?auto=format&fit=crop&w=900&q=85"},
+    {id:13,name:"Sp5der P*NK Hoodie Black",category:"clothing",price:150,tag:"New",image:"assets/sp5der-pink-hoodie.webp"},
   ];
   const $ = (selector) => document.querySelector(selector);
   // Cycle the homepage hero through every product in the collection.
@@ -91,7 +92,7 @@
       const imageWrap = document.createElement("div");
       imageWrap.className = "product-image-wrap";
       const image = document.createElement("img");
-      image.className = product.id === 1 ? "product-image product-image--contain" : "product-image";
+      image.className = product.id === 1 || product.id === 13 ? "product-image product-image--contain" : "product-image";
       image.src = product.image;
       image.alt = product.name;
       image.loading = "lazy";
